@@ -43,7 +43,7 @@ async function updatePublisher(req,res) {
 async function getPublishers(req, res) {
     try {
             const publishers = await Publisher.find({});
-            if (!publishers) return notFoundInDatabase(res, "Publisher");
+            if (!publishers) return notFoundInDatabase(res, "Publisher"); 
             res.send(publishers);
         } catch (error) {
             return InternalServerError(error,res)

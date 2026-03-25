@@ -82,48 +82,57 @@ async function borrowedForOneMember(req, res) {
 }
 
 
-async function borrowedForAll(req,res) {
-    try {
-        const totalBorrowed = await Transaction.countDocuments({
-        status: "Issued"
-        });
-        res.status(200).json({ totalBorrowed });
-    } catch (error) {
-        return InternalServerError(error,res);
-    }
+
+
+async function historyByMember(req, res) {
+  try {
+    const { memberId } = req.params;
+
+    const transactions = await Transaction.find({
+      memberId,
+      status: "Returned"
+    }).populate("bookId");
+
+    const result = transactions.map((t, index) => ({
+      id: index + 1,
+      title: t.bookId?.title,
+      borrowDate: t.issueDate,
+      returnDate: t.returnDate,
+      status: t.status,
+      fine: `$${t.fineAmount}`
+    }));
+
+    res.status(200).json(result);
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
 }
 
-async function activeLoansOnePerson(req,res) {
-    try {
-        const { memberId } = req.params; // or req.body / req.query, depending on your API design
-        if (!memberId) {
-            return res.status(400).json({ error: "memberId is required" });
-        }
-        const activeLoans = await Transaction.countDocuments({
-        memberId: memberId,
-        status: { $in: ["Issued", "Overdue"] }
-        });
-        res.status(200).json({ activeLoans });
-    } catch (error) {
-        return InternalServerError(error)
-    }
-}
+async function borrowedBooksWithDetails(req, res) {
+  try {
+    const { memberId } = req.params;
 
-async function borrowedBooksWithDetails(req,res) {
-    try {
-        const { memberId } = req.params; // or req.body / req.query, depending on your API design
-    if (!memberId) {
-      return res.status(400).json({ error: "memberId is required" });
-    }
-        const books = await Transaction.find({
-            memberId: memberId,
-            status: "Issued"
-            })
-            .populate("bookId");
-        res.status(200).json({books});
-    } catch (error) {
-        return InternalServerError(error);
-    }
+    const transactions = await Transaction.find({
+      memberId,
+      status: { $in: ["Issued", "Overdue"] }
+    }).populate("bookId");
+
+    const result = transactions.map((t, index) => ({
+      id: index + 1,
+      title: t.bookId?.title,
+      author: t.bookId?.author,
+      borrowDate: t.issueDate,
+      dueDate: t.dueDate,
+      status: t.status,
+      fine: `$${t.fineAmount}`
+    }));
+
+    res.status(200).json(result);
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
 }
 export {
     addTransaction,
@@ -132,7 +141,6 @@ export {
     getTransactionById,
     deleteTransaction,
     borrowedForOneMember,
-    borrowedForAll,
-    activeLoansOnePerson,
+    historyByMember,
     borrowedBooksWithDetails
 }

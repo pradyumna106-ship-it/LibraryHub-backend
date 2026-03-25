@@ -51,6 +51,15 @@ async function getMemberById(req,res) {
        return InternalServerError(error,res);
     }
 }
+async function getMemberByEmail(req,res) {
+    try {
+        const member = await Member.findOne({email:req.params.email.toLowerCase()});
+        if (!member) return notFoundInDatabase(res, "Member");
+        res.send(member);
+    } catch (error) {
+       return InternalServerError(error,res);
+    }
+}
 async function deleteMember(req,res) {
     try {
         const member = await Member.findByIdAndDelete(req.params.id);
@@ -103,5 +112,6 @@ export {
     getMembers,
     getMemberById,
     deleteMember,
-    loginMember
+    loginMember,
+    getMemberByEmail,
 }
