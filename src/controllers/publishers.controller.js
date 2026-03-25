@@ -14,6 +14,12 @@ async function addPublisher(req,res) {
                 message:"Member Added Successfully", publisher
             })
         } catch (error) {
+            // 🔥 HANDLE DUPLICATE EMAIL
+                if (error.code === 11000) {
+                return res.status(400).json({
+                    message: "Email already exists"
+                });
+                }
             return InternalServerError(error,res);
         }
 }

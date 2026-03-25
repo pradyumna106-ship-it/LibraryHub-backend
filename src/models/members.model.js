@@ -1,11 +1,6 @@
 import { Schema,model } from "mongoose";
-
+import bcrypt from "bcrypt";
 const memberSchema = new Schema({
-  memberId: {
-    type: String,
-    unique: true // e.g. M12345
-  },
-
   name: {
     type: String,
     required: true,
