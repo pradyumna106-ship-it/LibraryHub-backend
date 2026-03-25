@@ -6,17 +6,25 @@ async function addTransaction(req,res) {
     try {
         const { isValid, missingFields } = validateAllFields(req.body);
         if (!isValid) {
-                return res.status(400).json(missingField(missingFields));
+            return res.status(400).json(missingField(missingFields));
         }
-        const transaction = await Transaction.create(req.body)
+        const transaction = await Transaction.create(req.body);
+        await createNotification({
+            userId: memberId,
+            role: "Member",
+            type: "success",
+            title: "Book Issued",
+            message: `Book issued successfully. Due on ${dueDate.toDateString()}`
+          });
         res.status(201).json({
-            message:"Member Added Successfully", transaction
-        })
+            message: "Transaction Added Successfully",
+            transaction
+        });
+
     } catch (error) {
-        InternalServerError(error)
+        return InternalServerError(error, res);
     }
 }
-
 async function updateTransaction(req,res) {
     try {
     const { isValid, missingFields } = validateAllFields(req.body);
@@ -34,13 +42,16 @@ async function updateTransaction(req,res) {
 }
 
 async function getTransactions(req,res) {
-        try {
-            const transactions = await Transaction.find({});
-            if (!transactions) return notFoundInDatabase(res, "Transaction");
-            res.send(books);
-        } catch (error) {
-           return InternalServerError(error,res);
+    try {
+        const transactions = await Transaction.find({});
+        if (transactions.length === 0) {
+            return notFoundInDatabase(res, "Transaction");
         }
+        res.status(200).json(transactions);
+
+    } catch (error) {
+        return InternalServerError(error,res);
+    }
 }
 
 async function getTransactionById(req,res) {
@@ -134,6 +145,54 @@ async function borrowedBooksWithDetails(req, res) {
     return InternalServerError(error, res);
   }
 }
+
+async function getDashboardStats(req, res) {
+  try {
+    const { memberId } = req.params;
+
+    if (!memberId) {
+      return res.status(400).json({ message: "memberId is required" });
+    }
+
+    // 1️⃣ Borrowed Books Count
+    const borrowed = await Transaction.countDocuments({
+      memberId,
+      status: "Issued"
+    });
+
+    // 2️⃣ Nearest Due Date (important)
+    const nextDue = await Transaction.findOne({
+      memberId,
+      status: "Issued"
+    }).sort({ dueDate: 1 }); // earliest due
+
+    // 3️⃣ Total Fine
+    const fineData = await Transaction.aggregate([
+      {
+        $match: { memberId: new mongoose.Types.ObjectId(memberId) }
+      },
+      {
+        $group: {
+          _id: null,
+          totalFine: { $sum: "$fineAmount" }
+        }
+      }
+    ]);
+
+    const totalFine = fineData[0]?.totalFine || 0;
+
+    // 4️⃣ Final Response
+    res.status(200).json({
+      borrowed,
+      dueDate: nextDue ? nextDue.dueDate : null,
+      fine: `₹${totalFine}`
+    });
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
+
 export {
     addTransaction,
     updateTransaction,
@@ -142,5 +201,6 @@ export {
     deleteTransaction,
     borrowedForOneMember,
     historyByMember,
-    borrowedBooksWithDetails
+    borrowedBooksWithDetails,
+    getDashboardStats
 }

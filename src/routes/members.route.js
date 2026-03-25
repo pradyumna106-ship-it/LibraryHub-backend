@@ -8,6 +8,5 @@ router.route('/fetchAll').get(getMembers);
 router.route('/fetchById/:id').get(getMemberById);
 router.route('/fetchByEmail/:email').get(getMemberByEmail)
 router.route('/deleteById/:id').delete(deleteMember);
-
 router.route('/login').post(loginMember);
 export default router;

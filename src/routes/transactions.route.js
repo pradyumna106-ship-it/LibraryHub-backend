@@ -12,4 +12,5 @@ router.route('/deleteById/:id').delete(deleteTransaction);
 router.route('/borrowByMemberId/:memberId').get(borrowedForOneMember);
 router.route('/historyByMemberId/:memberId').get(historyByMember);
 router.route('/borrowDetailsByMemberId/:memberId').get(borrowedBooksWithDetails);
+router.route('/dashboardStats').get
 export default router;
