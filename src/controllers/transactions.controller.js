@@ -80,13 +80,16 @@ async function borrowedForOneMember(req, res) {
     if (!memberId) {
       return res.status(400).json({ error: "memberId is required" });
     }
-    const borrowedCount = await Transaction.countDocuments({
+    const borrowedBooks = await Transaction.find({
       memberId,
-      status: "Issued",
+      status: "Issued" // ✅ filter correctly
     });
-    // You don’t need to check `transaction` here unless you also fetch a specific transaction
-    // If you’re only counting, just send the count:
-    res.status(200).json({ borrowedCount });
+
+    res.status(200).json({
+      success: true,
+      data: borrowedBooks
+    });
+
   } catch (error) {
     return InternalServerError(error, res);
   }

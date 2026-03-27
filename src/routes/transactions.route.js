@@ -1,5 +1,6 @@
 import { Router } from "express";
-import {  addTransaction, borrowedBooksWithDetails, historyByMember, borrowedForOneMember, deleteTransaction, getTransactionById, getTransactions, updateTransaction } from "../controllers/transactions.controller.js";
+import {  addTransaction, borrowedBooksWithDetails, historyByMember, borrowedForOneMember, deleteTransaction, getTransactionById, getTransactions, updateTransaction, getDashboardStats } from "../controllers/transactions.controller.js";
+
 
 const router = Router();
 
@@ -12,5 +13,5 @@ router.route('/deleteById/:id').delete(deleteTransaction);
 router.route('/borrowByMemberId/:memberId').get(borrowedForOneMember);
 router.route('/historyByMemberId/:memberId').get(historyByMember);
 router.route('/borrowDetailsByMemberId/:memberId').get(borrowedBooksWithDetails);
-router.route('/dashboardStats').get
+router.route('/dashboardStats').get(getDashboardStats);
 export default router;

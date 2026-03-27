@@ -37,7 +37,12 @@ const memberSchema = new Schema({
     type: String,
     required: true
   },
-
+  myBooks: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Book"
+    }
+  ],
   memberType: {
     type: String,
     required: true,

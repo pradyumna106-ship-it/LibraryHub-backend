@@ -37,7 +37,11 @@ async function getBooks(req,res) {
     try {
         const books = await Book.find({});
         if (!books) return notFoundInDatabase(res, "Book");
-        res.send(books);
+         res.send(books);
+        // res.status(200).json({
+        //     message: "success fully sent data",
+        //     books
+        // })
     } catch (error) {
        return InternalServerError(error,res);
     }
@@ -63,31 +67,12 @@ async function deleteBook(req, res) {
     }
 }
 
-async function getMyBooks(req, res) {
-  try {
-    const books = await Book.find();
 
-    const result = books.map((b, index) => ({
-      id: index + 1,
-      title: b.title,
-      author: b.author,
-      category: b.category,
-      price: `$${b.price}`,
-      image: b.image
-    }));
-
-    res.status(200).json(result);
-
-  } catch (error) {
-    return InternalServerError(error, res);
-  }
-}
 
 export {
     addBook,
     updateBook,
     getBooks,
     getBookById,
-    deleteBook,
-    getMyBooks
+    deleteBook
 }

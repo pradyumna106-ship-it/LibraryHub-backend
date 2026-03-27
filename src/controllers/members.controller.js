@@ -105,6 +105,69 @@ async function loginMember(req,res) {
             return InternalServerError(error,res);
     }
 };
+async function getMyBooks(req, res) {
+  try {
+    const { id } = req.params; // ✅ FIX 1
+
+    if (!id) {
+      return res.status(400).json({ message: "memberId is required" });
+    }
+
+    // ✅ Populate books
+    const member = await Member.findById(id).populate("myBooks");
+
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // ✅ FIX 2: use member.myBooks instead of books
+
+    res.send(member.myBooks);
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
+
+async function addMyBooks(req, res) {
+  try {
+    const { id } = req.params;
+    const { bookId } = req.body; // ✅ array
+
+    // if (!id || !bookId || !Array.isArray(bookId)) {
+    //   return res.status(400).json({
+    //     message: "memberId and bookIds (array) are required"
+    //   });
+    // }
+
+    const member = await Member.findById(id);
+
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // ✅ Remove duplicates
+
+// ✅ Add only new books
+member.myBooks.push(bookId);
+
+// ✅ Save
+await member.save();
+
+// ✅ Populate
+await member.populate("myBooks");
+
+res.status(200).json({
+  message: "Books added to MyBooks successfully",
+  data: member.myBooks
+});
+
+  } catch (error) {
+    console.error(error)
+    return InternalServerError(error, res);
+  }
+}
+
 
 export {
     addMember,
@@ -114,4 +177,6 @@ export {
     deleteMember,
     loginMember,
     getMemberByEmail,
+    getMyBooks,
+    addMyBooks
 }

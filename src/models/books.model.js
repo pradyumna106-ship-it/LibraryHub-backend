@@ -40,7 +40,6 @@ const bookSchema = new Schema({
     type: String, // URL or local path
     default: ""
   },
-
   publisherId: {
     type: Schema.Types.ObjectId, // ✅ better than String
     ref: "Publisher",
