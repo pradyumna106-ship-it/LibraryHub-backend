@@ -3,6 +3,7 @@ import bookRouter  from "./routes/books.route.js";
 import memberRouter from "./routes/members.route.js";
 import publisherRouter from "./routes/publishers.route.js";
 import transactionRouter from "./routes/transactions.route.js";
+import adminRouter from "./routes/admins.route.js";
 import cors from "cors";
 const app = express();
 app.use(
@@ -17,5 +18,6 @@ app.use('/api/v1/book',bookRouter);
 app.use('/api/v1/member',memberRouter);
 app.use('/api/v1/publisher',publisherRouter)
 app.use('/api/v1/transaction',transactionRouter)
+app.use('/api/v1/admin',adminRouter)
 
 export default app;

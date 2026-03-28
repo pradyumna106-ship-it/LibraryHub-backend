@@ -1,6 +1,7 @@
 import { validateAllFields } from "../utils/validate.js"
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { Transaction } from "../models/transactions.model.js";
+import mongoose from "mongoose";
 
 async function addTransaction(req,res) {
     try {
