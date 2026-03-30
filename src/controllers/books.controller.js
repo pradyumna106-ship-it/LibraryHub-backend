@@ -47,6 +47,19 @@ async function getBooks(req,res) {
     }
 }
 
+async function getBookCount(req,res) {
+    try {
+        const books = await Book.countDocuments({});
+        if (!books) return notFoundInDatabase(res, "Book");
+         res.send(books);
+        // res.status(200).json({
+        //     message: "success fully sent data",
+        //     books
+        // })
+    } catch (error) {
+       return InternalServerError(error,res);
+    }
+}
 async function getBookById(req,res) {
     try {
         const book = await Book.findById(req.params.id);
@@ -74,5 +87,6 @@ export {
     updateBook,
     getBooks,
     getBookById,
-    deleteBook
+    deleteBook,
+    getBookCount
 }

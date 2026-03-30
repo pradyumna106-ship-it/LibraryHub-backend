@@ -129,6 +129,20 @@ async function getMyBooks(req, res) {
   }
 }
 
+async function getMemberCount(req,res) {
+    try {
+        const books = await Member.countDocuments({});
+        if (!books) return notFoundInDatabase(res, "Book");
+         res.send(books);
+        // res.status(200).json({
+        //     message: "success fully sent data",
+        //     books
+        // })
+    } catch (error) {
+       return InternalServerError(error,res);
+    }
+}
+
 async function addMyBooks(req, res) {
   try {
     const { id } = req.params;
@@ -178,5 +192,6 @@ export {
     loginMember,
     getMemberByEmail,
     getMyBooks,
-    addMyBooks
+    addMyBooks,
+    getMemberCount
 }

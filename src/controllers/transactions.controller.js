@@ -2,6 +2,7 @@ import { validateAllFields } from "../utils/validate.js"
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { Transaction } from "../models/transactions.model.js";
 import mongoose from "mongoose";
+import { BorrowRequest } from "../models/borrowRequestSchema.js";
 
 async function addTransaction(req,res) {
     try {
@@ -197,6 +198,23 @@ async function getDashboardStats(req, res) {
   }
 }
 
+async function getIssuedCount(req,res) {
+    try {
+        const Issues = await Transaction.countDocuments({
+          status: "Issued"
+        });
+        // res.status(200).json({
+        //     message: "success fully sent data",
+        //     books
+        // })
+        res.send(Issues);
+    } catch (error) {
+       return InternalServerError(error,res);
+    }
+}
+
+
+
 export {
     addTransaction,
     updateTransaction,
@@ -206,5 +224,6 @@ export {
     borrowedForOneMember,
     historyByMember,
     borrowedBooksWithDetails,
-    getDashboardStats
+    getDashboardStats,
+    getIssuedCount
 }

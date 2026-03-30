@@ -35,8 +35,8 @@ const transactionSchema = new Schema({
 
   status: {
     type: String,
-    enum: ["Issued", "Returned", "Overdue"],
-    default: "Issued"
+    enum: ["Pending", "OverDue", "Returned", "Issued"],
+    default: "Pending"
   }
 
 }, {

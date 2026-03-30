@@ -52,7 +52,7 @@ async function getPublishers(req, res) {
 
 async function getPublisherById(req,res) {
     try {
-            const publisher = await Publisher.findById(req,params.id);
+            const publisher = await Publisher.findById(req.params.id);
             if (!publisher) return notFoundInDatabase(res, "Publisher");
             res.send(publisher);
         } catch (error) {
