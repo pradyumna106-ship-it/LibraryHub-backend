@@ -4,6 +4,7 @@ import memberRouter from "./routes/members.route.js";
 import publisherRouter from "./routes/publishers.route.js";
 import transactionRouter from "./routes/transactions.route.js";
 import adminRouter from "./routes/admins.route.js";
+import borrowRequestRouter from "./routes/borrowRequest.route.js";
 import cors from "cors";
 const app = express();
 app.use(
@@ -19,5 +20,5 @@ app.use('/api/v1/member',memberRouter);
 app.use('/api/v1/publisher',publisherRouter)
 app.use('/api/v1/transaction',transactionRouter)
 app.use('/api/v1/admin',adminRouter)
-
+app.use('/api/v1/borrowRequest',borrowRequestRouter)
 export default app;

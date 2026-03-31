@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addBorrowRequest, deleteBorrowRequest, getBorrowRequestById, getBorrowRequests, updateBorrowRequest, updateRequestStatus } from "../controllers/borrowRequest.controller";
+import { addBorrowRequest, deleteBorrowRequest, getBorrowRequestById, getBorrowRequests, updateBorrowRequest, updateRequestStatus } from "../controllers/borrowRequest.controller.js";
 
 const router = Router();
 router.route('/add').post(addBorrowRequest);

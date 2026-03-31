@@ -164,10 +164,8 @@ async function addMyBooks(req, res) {
 
 // ✅ Add only new books
 member.myBooks.push(bookId);
-
 // ✅ Save
 await member.save();
-
 // ✅ Populate
 await member.populate("myBooks");
 
@@ -175,6 +173,43 @@ res.status(200).json({
   message: "Books added to MyBooks successfully",
   data: member.myBooks
 });
+
+  } catch (error) {
+    console.error(error)
+    return InternalServerError(error, res);
+  }
+}
+async function deleteMyBooks(req, res) {
+  try {
+    const { id } = req.params;
+    const { bookId } = req.body; // ✅ array
+
+    // if (!id || !bookId || !Array.isArray(bookId)) {
+    //   return res.status(400).json({
+    //     message: "memberId and bookIds (array) are required"
+    //   });
+    // }
+
+    const member = await Member.findById(id);
+
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // ✅ Remove duplicates
+
+    // ✅ Add only new books
+    const index = member.myBooks.indexOf(bookId);
+    member.myBooks.splice(index,1);
+    // ✅ Save
+    await member.save();
+    // ✅ Populate
+    await member.populate("myBooks");
+
+    res.status(200).json({
+    message: "Books added to MyBooks successfully",
+    data: member.myBooks
+    });
 
   } catch (error) {
     console.error(error)
@@ -193,5 +228,6 @@ export {
     getMemberByEmail,
     getMyBooks,
     addMyBooks,
-    getMemberCount
+    getMemberCount,
+    deleteMyBooks
 }

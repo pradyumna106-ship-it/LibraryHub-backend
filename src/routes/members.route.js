@@ -11,6 +11,6 @@ router.route('/deleteById/:id').delete(deleteMember);
 router.route('/login').post(loginMember);
 router.route('/getMyBooks/:id').get(getMyBooks);
 router.route('/addMyBooks/:id').put(addMyBooks);
-
+router.route('/deleteMyBooks/:id').put(deleteMember);
 router.route('/countAll').get(getMemberCount);
 export default router;

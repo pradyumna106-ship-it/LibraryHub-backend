@@ -97,7 +97,66 @@ async function borrowedForOneMember(req, res) {
   }
 }
 
+async function getTransactionsWithNameTitle(req, res) {
+  try {
+    const transactions = await Transaction.aggregate([
 
+      // 🔗 Join Member
+      {
+        $lookup: {
+          from: "members", // collection name in MongoDB
+          localField: "memberId",
+          foreignField: "_id",
+          as: "member"
+        }
+      },
+
+      // 🔗 Join Book
+      {
+        $lookup: {
+          from: "books",
+          localField: "bookId",
+          foreignField: "_id",
+          as: "book"
+        }
+      },
+
+      // Convert array → object
+      {
+        $unwind: "$member"
+      },
+      {
+        $unwind: "$book"
+      },
+
+      // 🎯 Final Output Shape
+      {
+        $project: {
+          _id: 1,
+          transactionId: "$_id",
+          memberName: "$member.name",
+          bookTitle: "$book.title",
+          issueDate: 1,
+          dueDate: 1,
+          returnDate: 1,
+          status: 1,
+          fineAmount: 1
+        }
+      }
+
+    ]);
+
+    if (transactions.length === 0) {
+      res.send([])
+      return notFoundInDatabase(res, "Transaction");
+    }
+
+    res.send(transactions);
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
 
 
 async function historyByMember(req, res) {
@@ -213,6 +272,48 @@ async function getIssuedCount(req,res) {
     }
 }
 
+async function getTransactionHistory(req, res) {
+  try {
+    const transactions = await Transaction.aggregate([
+      {
+        $match: { status: {$in: ["Returned", "OverDue"]} } // 🔥 only history
+      },
+      {
+        $lookup: {
+          from: "members",
+          localField: "memberId",
+          foreignField: "_id",
+          as: "member"
+        }
+      },
+      {
+        $lookup: {
+          from: "books",
+          localField: "bookId",
+          foreignField: "_id",
+          as: "book"
+        }
+      },
+      { $unwind: "$member" },
+      { $unwind: "$book" },
+
+      {
+        $project: {
+          memberName: "$member.name",
+          stock: "$book.title",
+          issueDate: 1,
+          returnDate: 1,
+          status: 1
+        }
+      }
+    ]);
+
+    res.send(transactions);
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
 
 
 export {
@@ -225,5 +326,7 @@ export {
     historyByMember,
     borrowedBooksWithDetails,
     getDashboardStats,
-    getIssuedCount
+    getIssuedCount,
+    getTransactionsWithNameTitle,
+    getTransactionHistory
 }
