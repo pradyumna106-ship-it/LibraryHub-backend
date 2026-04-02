@@ -61,6 +61,17 @@ async function getBorrowRequestById(req,res) {
     }
 }
 
+async function getBorrowRequestByMemberId(req,res) {
+    try {
+            const {memberId} = req.params
+            const request = await BorrowRequest.findOne({memberId});
+            if (!request) return notFoundInDatabase(res, "BorrowRequest");
+            res.send(request);
+        } catch (error) {
+            return InternalServerError(error,res)
+    }
+}
+
 async function deleteBorrowRequest(req,res) {
     try {
             const request = await BorrowRequest.findByIdAndDelete(req.params.id);
@@ -138,5 +149,6 @@ export {
     getBorrowRequests,
     getBorrowRequestById,
     deleteBorrowRequest,
-    updateRequestStatus
+    updateRequestStatus,
+    getBorrowRequestByMemberId
 }

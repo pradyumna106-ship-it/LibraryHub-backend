@@ -18,7 +18,7 @@ const borrowRequestSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Approved", "Rejected"],
+    enum: ["Pending", "Approved", "Rejected","Completed"],
     default: "Pending"
   }
 }, { timestamps: true });

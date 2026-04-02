@@ -15,6 +15,8 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // for form
+app.use("/uploads", express.static("uploads"));
 app.use('/api/v1/book',bookRouter);
 app.use('/api/v1/member',memberRouter);
 app.use('/api/v1/publisher',publisherRouter)

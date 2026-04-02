@@ -4,21 +4,44 @@ import { Transaction } from "../models/transactions.model.js";
 import mongoose from "mongoose";
 import { BorrowRequest } from "../models/borrowRequestSchema.js";
 
-async function addTransaction(req,res) {
+async function addTransaction(req, res) {
     try {
-        const { isValid, missingFields } = validateAllFields(req.body);
+        const { memberId, bookId } = req.body;
+        const existing = await Transaction.findOne({
+            memberId,
+            bookId,
+            status: "Issued"
+          });
+          if (existing) {
+              return res.status(200).json({
+                message: "Transaction already exists",
+                transaction: existing
+              });
+            }
+        const transactionData = {
+            memberId,
+            bookId,
+            issueDate: new Date(),
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // always set
+            status: "Issued" // force correct value
+        };
+
+        const { isValid, missingFields } = validateAllFields(transactionData);
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
         }
-        const transaction = await Transaction.create(req.body);
+
+        const transaction = await Transaction.create(transactionData);
+
         await createNotification({
             userId: memberId,
             role: "Member",
             type: "success",
             title: "Book Issued",
-            message: `Book issued successfully. Due on ${dueDate.toDateString()}`
-          });
-        res.status(201).json({
+            message: `Book issued successfully. Due on ${transactionData.dueDate.toDateString()}`
+        });
+
+        return res.status(201).json({
             message: "Transaction Added Successfully",
             transaction
         });
@@ -49,7 +72,7 @@ async function getTransactions(req,res) {
         if (transactions.length === 0) {
             return notFoundInDatabase(res, "Transaction");
         }
-        res.status(200).json(transactions);
+        res.send(transactions);
 
     } catch (error) {
         return InternalServerError(error,res);

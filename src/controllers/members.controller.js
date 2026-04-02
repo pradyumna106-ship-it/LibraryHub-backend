@@ -8,11 +8,38 @@ async function addMember(req,res) {
         if (!isValid) {
                 return res.status(400).json(missingField(missingFields));
         }
-        const member = await Member.create(req.body)
+        const { name, email, password } = req.body;
+        console.log(name,email,password)
+        // ✅ declare first
+        const missingField = !name || !email || !password;
+
+        // ✅ then use
+        if (missingField) {
+        return res.status(400).json({
+            message: "Required fields are missing"
+        });
+        }
+        // ✅ CHECK FIRST
+        const existingUser = await Member.findOne({ email });
+
+        if (existingUser) {
+        return res.status(400).json({
+            message: "Email already exists"
+        });
+        }
+        let avatar = "";
+        if (req.file) {
+            avatar = req.file.filename;
+        } else if (typeof req.body.avatar === "string") {
+            avatar = req.body.avatar;
+        }
+        console.log(req.body)
+        const member = await Member.create(req.body);
         res.status(201).json({
             message:"Member Added Successfully", member
         })
     } catch (error) {
+        console.error(error)
         InternalServerError(error,res);
     }
 }
@@ -162,17 +189,17 @@ async function addMyBooks(req, res) {
 
     // ✅ Remove duplicates
 
-// ✅ Add only new books
-member.myBooks.push(bookId);
-// ✅ Save
-await member.save();
-// ✅ Populate
-await member.populate("myBooks");
+    // ✅ Add only new books
+    member.myBooks.push(bookId);
+    // ✅ Save
+    await member.save();
+    // ✅ Populate
+    await member.populate("myBooks");
 
-res.status(200).json({
-  message: "Books added to MyBooks successfully",
-  data: member.myBooks
-});
+    res.status(200).json({
+    message: "Books added to MyBooks successfully",
+    data: member.myBooks
+    });
 
   } catch (error) {
     console.error(error)
@@ -199,8 +226,10 @@ async function deleteMyBooks(req, res) {
     // ✅ Remove duplicates
 
     // ✅ Add only new books
-    const index = member.myBooks.indexOf(bookId);
-    member.myBooks.splice(index,1);
+        member.myBooks = member.myBooks.filter(
+            (b) => b.toString() !== bookId
+            );
+    
     // ✅ Save
     await member.save();
     // ✅ Populate
