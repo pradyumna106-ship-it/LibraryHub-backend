@@ -101,19 +101,51 @@ async function deleteTransaction(req,res) {
 
 async function borrowedForOneMember(req, res) {
   try {
-    const { memberId } = req.params; // or req.body / req.query, depending on your API design
+    const { memberId } = req.params;
+
     if (!memberId) {
       return res.status(400).json({ error: "memberId is required" });
     }
-    const borrowedBooks = await Transaction.find({
-      memberId,
-      status: "Issued" // ✅ filter correctly
-    });
 
-    res.status(200).json({
-      success: true,
-      data: borrowedBooks
-    });
+    const borrowedBooks = await Transaction.aggregate([
+      {
+        $match: {
+          memberId: new mongoose.Types.ObjectId(memberId),
+          status: "Issued"
+        }
+      },
+      {
+        $lookup: {
+          from: "books",            // ⚠️ collection name (lowercase plural)
+          localField: "bookId",
+          foreignField: "_id",
+          as: "bookDetails"
+        }
+      },
+      {
+        $unwind: "$bookDetails"    // convert array → object
+      },
+      {
+        $project: {
+          _id: 1,
+          memberId: 1,
+          bookId: 1,
+          issueDate: 1,
+          dueDate: 1,
+          returnDate: 1,
+          status: 1,
+
+          // ✅ Book fields
+          title: "$bookDetails.title",
+          author: "$bookDetails.author",
+          category: "$bookDetails.category",
+          price: "$bookDetails.price",
+          image: "$bookDetails.image"
+        }
+      }
+    ]);
+
+    res.send(borrowedBooks);
 
   } catch (error) {
     return InternalServerError(error, res);
@@ -123,7 +155,6 @@ async function borrowedForOneMember(req, res) {
 async function getTransactionsWithNameTitle(req, res) {
   try {
     const transactions = await Transaction.aggregate([
-
       // 🔗 Join Member
       {
         $lookup: {
@@ -133,7 +164,6 @@ async function getTransactionsWithNameTitle(req, res) {
           as: "member"
         }
       },
-
       // 🔗 Join Book
       {
         $lookup: {
@@ -143,7 +173,6 @@ async function getTransactionsWithNameTitle(req, res) {
           as: "book"
         }
       },
-
       // Convert array → object
       {
         $unwind: "$member"
@@ -151,7 +180,6 @@ async function getTransactionsWithNameTitle(req, res) {
       {
         $unwind: "$book"
       },
-
       // 🎯 Final Output Shape
       {
         $project: {
@@ -166,16 +194,12 @@ async function getTransactionsWithNameTitle(req, res) {
           fineAmount: 1
         }
       }
-
     ]);
-
     if (transactions.length === 0) {
       res.send([])
       return notFoundInDatabase(res, "Transaction");
     }
-
     res.send(transactions);
-
   } catch (error) {
     return InternalServerError(error, res);
   }
@@ -299,7 +323,7 @@ async function getTransactionHistory(req, res) {
   try {
     const transactions = await Transaction.aggregate([
       {
-        $match: { status: {$in: ["Returned", "OverDue"]} } // 🔥 only history
+        $match: { status: { $in: ["Returned", "OverDue"] } } // 🔥 only history
       },
       {
         $lookup: {
@@ -338,6 +362,82 @@ async function getTransactionHistory(req, res) {
   }
 }
 
+async function renewTransaction(req, res) {
+  try {
+    const { id } = req.params;
+
+    const transaction = await Transaction.findById(id);
+
+    if (!transaction) {
+      return notFoundInDatabase(res, "Transaction");
+    }
+
+    if (transaction.status !== "Issued") {
+      return res.status(400).json({
+        message: "Only issued books can be renewed"
+      });
+    }
+
+    // ✅ Extend due date by 7 days
+    transaction.dueDate = new Date(
+      transaction.dueDate.getTime() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    await transaction.save();
+
+    res.status(200).json({
+      message: "Book renewed successfully",
+      dueDate: transaction.dueDate,
+      transaction
+    });
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
+
+async function returnTransaction(req, res) {
+  try {
+    const { id } = req.params;
+
+    const transaction = await Transaction.findById(id);
+
+    if (!transaction) {
+      return notFoundInDatabase(res, "Transaction");
+    }
+
+    if (transaction.status !== "Issued") {
+      return res.status(400).json({
+        message: "Book already returned or invalid"
+      });
+    }
+
+    const now = new Date();
+
+    transaction.returnDate = now;
+    transaction.status = "Returned";
+
+    // ✅ Fine calculation (₹10 per day late)
+    if (now > transaction.dueDate) {
+      const diffTime = now - transaction.dueDate;
+      const daysLate = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      transaction.fineAmount = daysLate * 10;
+    } else {
+      transaction.fineAmount = 0;
+    }
+
+    await transaction.save();
+
+    res.status(200).json({
+      message: "Book returned successfully",
+      fine: transaction.fineAmount,
+      transaction
+    });
+
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
+}
 
 export {
     addTransaction,
@@ -351,5 +451,7 @@ export {
     getDashboardStats,
     getIssuedCount,
     getTransactionsWithNameTitle,
-    getTransactionHistory
+    getTransactionHistory,
+    renewTransaction,
+    returnTransaction
 }
