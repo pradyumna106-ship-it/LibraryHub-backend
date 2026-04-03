@@ -1,6 +1,9 @@
 import { Book } from "../models/books.model.js";
 import { validateAllFields } from "../utils/validate.js"
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
+import { missingField } from "../exception/exception.js";
+import { createNotification } from "../utils/notification.controller.js";
+import { Publisher } from "../models/publishers.model.js";
 async function addBook(req,res) {
     try {
         const { isValid, missingFields } = validateAllFields(req.body);
@@ -9,6 +12,15 @@ async function addBook(req,res) {
                 }
 
         const book = await Book.create(req.body);
+        const publisher = await Publisher.findById(book.publisherId);
+
+        await createNotification({
+            role: "Admin",
+            type: "info",
+            title: "New Book Added",
+            message: `New book "${book.title}" by ${book.author} from publisher ${publisher?.name || "Unknown"} was added to library.`,
+        });
+
         res.status(201).json({
             message:"Book Added Successfully", book
         })

@@ -5,6 +5,7 @@ import publisherRouter from "./routes/publishers.route.js";
 import transactionRouter from "./routes/transactions.route.js";
 import adminRouter from "./routes/admins.route.js";
 import borrowRequestRouter from "./routes/borrowRequest.route.js";
+import notificationRouter from "./routes/notifications.route.js";
 import cors from "cors";
 const app = express();
 app.use(
@@ -23,4 +24,5 @@ app.use('/api/v1/publisher',publisherRouter)
 app.use('/api/v1/transaction',transactionRouter)
 app.use('/api/v1/admin',adminRouter)
 app.use('/api/v1/borrowRequest',borrowRequestRouter)
+app.use('/api/v1/notification',notificationRouter)
 export default app;

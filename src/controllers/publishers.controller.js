@@ -2,6 +2,7 @@ import { missingField } from "../exception/exception.js";
 import { Publisher } from "../models/publishers.model.js";
 import { validateAllFields } from "../utils/validate.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
+import { createNotification } from "../utils/notification.controller.js";
 
 async function addPublisher(req,res) {
     try {
@@ -10,6 +11,14 @@ async function addPublisher(req,res) {
             return res.status(400).json(missingField(missingFields));
         }
             const publisher = await Publisher.create(req.body)
+
+            await createNotification({
+                role: "Admin",
+                type: "info",
+                title: "New Publisher Added",
+                message: `Publisher "${publisher.name}" was added to the library directory.`,
+            });
+
             res.status(201).json({
                 message:"Member Added Successfully", publisher
             })

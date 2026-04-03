@@ -4,7 +4,8 @@ const notificationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Member", // or Admin
-    required: true
+    required: false,
+    default: null
   },
   role: {
     type: String,
@@ -26,4 +27,4 @@ const notificationSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const Notification = mongoose.model("Notification", notificationSchema);
+export const Notification = mongoose.model("notification", notificationSchema);
