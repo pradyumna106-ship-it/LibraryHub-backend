@@ -3,6 +3,8 @@ import { missingField } from "../exception/exception.js";
 import { validateAllFields } from "../utils/validate.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { BorrowRequest } from "../models/borrowRequestSchema.js";
+import { Book } from "../models/books.model.js";
+import { Transaction } from "../models/transactions.model.js";
 
 async function addBorrowRequest(req,res) {
     try {
@@ -63,10 +65,12 @@ async function getBorrowRequestById(req,res) {
 
 async function getBorrowRequestByMemberId(req,res) {
     try {
-            const {memberId} = req.params
-            const request = await BorrowRequest.findOne({memberId});
-            if (!request) return notFoundInDatabase(res, "BorrowRequest");
-            res.send(request);
+            const { memberId } = req.params;
+            const requests = await BorrowRequest.find({ memberId });
+            if (!requests || requests.length === 0) {
+                return notFoundInDatabase(res, "BorrowRequest");
+            }
+            res.send(requests);
         } catch (error) {
             return InternalServerError(error,res)
     }
@@ -122,13 +126,15 @@ async function updateRequestStatus(req, res) {
         issueDate: new Date(),
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         status: "Issued",
-        requestId: request._id  // Link back to request
+        // BorrowRequest status is tracked in BorrowRequest collection.
       });
 
       // ✅ Update book stock
-      await Book.findByIdAndUpdate(request.bookId, { 
-        $inc: { stock: -1 }  // Reduce available stock
-      });
+      await Book.findByIdAndUpdate(
+        request.bookId,
+        { $set: { available: false } },
+        { new: true }
+      );
     }
 
     res.status(200).json({

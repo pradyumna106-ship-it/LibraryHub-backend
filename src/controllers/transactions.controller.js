@@ -1,8 +1,11 @@
 import { validateAllFields } from "../utils/validate.js"
+import { missingField } from "../exception/exception.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { Transaction } from "../models/transactions.model.js";
+import { Book } from "../models/books.model.js";
 import mongoose from "mongoose";
 import { BorrowRequest } from "../models/borrowRequestSchema.js";
+import { createNotification } from "../utils/notification.controller.js";
 
 async function addTransaction(req, res) {
     try {
@@ -427,6 +430,25 @@ async function returnTransaction(req, res) {
     }
 
     await transaction.save();
+
+    // ✅ Make the book available again after return
+    await Book.findByIdAndUpdate(
+      transaction.bookId,
+      { $set: { available: true } },
+      { new: true }
+    );
+
+    // ✅ Update the corresponding borrow request for UI state.
+    // If the request is still marked "Approved", mark it "Completed" on return.
+    await BorrowRequest.findOneAndUpdate(
+      {
+        memberId: transaction.memberId,
+        bookId: transaction.bookId,
+        status: "Approved",
+      },
+      { $set: { status: "Completed" } },
+      { new: true }
+    );
 
     res.status(200).json({
       message: "Book returned successfully",

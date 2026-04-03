@@ -35,7 +35,8 @@ async function updateBook(req,res) {
 
 async function getBooks(req,res) {
     try {
-        const books = await Book.find({});
+        // Populate publisher so frontend can search by publisher name too.
+        const books = await Book.find({}).populate("publisherId");
         if (!books) return notFoundInDatabase(res, "Book");
          res.send(books);
         // res.status(200).json({
@@ -62,7 +63,7 @@ async function getBookCount(req,res) {
 }
 async function getBookById(req,res) {
     try {
-        const book = await Book.findById(req.params.id);
+        const book = await Book.findById(req.params.id).populate("publisherId");
         if (!book) return notFoundInDatabase(res, "Book");
         res.send(book);
     } catch (error) {
