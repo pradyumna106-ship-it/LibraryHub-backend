@@ -5,6 +5,7 @@ import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { BorrowRequest } from "../models/borrowRequestSchema.js";
 import { Book } from "../models/books.model.js";
 import { Transaction } from "../models/transactions.model.js";
+import { createNotification } from "../utils/notification.controller.js";
 
 async function addBorrowRequest(req,res) {
     try {
@@ -120,6 +121,8 @@ async function updateRequestStatus(req, res) {
     // 🔥 Auto-create Transaction for Approved requests
     let transaction = null;
     if (status === 'Approved') {
+      const book = await Book.findById(request.bookId);
+
       transaction = await Transaction.create({
         memberId: request.memberId,
         bookId: request.bookId,
@@ -135,6 +138,14 @@ async function updateRequestStatus(req, res) {
         { $set: { available: false } },
         { new: true }
       );
+
+      await createNotification({
+        userId: request.memberId,
+        role: "Member",
+        type: "success",
+        title: "Book Issued",
+        message: `Your request was approved. "${book?.title || "Book"}" has been issued to you.`,
+      });
     }
 
     res.status(200).json({

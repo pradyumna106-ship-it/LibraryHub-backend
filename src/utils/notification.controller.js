@@ -32,14 +32,14 @@ export const getNotifications = async (req, res) => {
             }
         }
 
-        // Member: show only member-specific notifications
+        // Member: show global member notifications + personal ones
         if (role === "Member") {
             if (!userId) {
                 return res.status(400).json({
                     message: "userId is required for Member role"
                 });
             }
-            query.userId = userId;
+            query.$or = [{ userId: null }, { userId }];
         }
 
         const notifications = await Notification.find(query).sort({ createdAt: -1 });
@@ -82,7 +82,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
             if (!userId) {
                 return res.status(400).json({ message: "userId is required for Member role" });
             }
-            query.userId = userId;
+            query.$or = [{ userId: null }, { userId }];
         }
 
         await Notification.updateMany(query, { $set: { read: true } });

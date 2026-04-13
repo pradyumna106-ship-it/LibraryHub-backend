@@ -21,6 +21,13 @@ async function addBook(req,res) {
             message: `New book "${book.title}" by ${book.author} from publisher ${publisher?.name || "Unknown"} was added to library.`,
         });
 
+        await createNotification({
+            role: "Member",
+            type: "info",
+            title: "New Book Arrived",
+            message: `A new book "${book.title}" by ${book.author} (${publisher?.name || "Unknown"}) is now available in library.`,
+        });
+
         res.status(201).json({
             message:"Book Added Successfully", book
         })
