@@ -35,7 +35,9 @@ const corsOptions = {
   optionsSuccessStatus: 200 // For legacy browsers
 };
 
-app.use(cors());
+app.use(cors({
+  origin: "https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app",
+  credentials: true}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));
