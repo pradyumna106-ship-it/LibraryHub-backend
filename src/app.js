@@ -35,7 +35,7 @@ const corsOptions = {
   optionsSuccessStatus: 200 // For legacy browsers
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));
