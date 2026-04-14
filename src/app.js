@@ -9,7 +9,10 @@ import notificationRouter from "./routes/notifications.route.js";
 import cors from "cors";
 const app = express();
 app.use(cors({
-  origin: "https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app/",
+  origin: [
+    "https://library-hub-frontend-theta.vercel.app",
+    "https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app"
+  ],
   credentials: true}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
