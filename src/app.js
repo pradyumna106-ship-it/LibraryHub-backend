@@ -10,7 +10,7 @@ import cors from "cors";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend URL
+    origin: ["http://localhost:5173","https://library-hub-frontend-theta.vercel.app","https://library-hub-frontend-git-main-j-pradyumnas-projects.vercel.app","https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app"], // frontend URL
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
