@@ -14,7 +14,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));
-app.get('api/v1',(req,res) => {res.status(200).json({message:"API Connected Successfully"})})
+app.get('/', (req, res) => {
+  res.status(200).json({ message: "API Connected Successfully" })
+})
 app.use('/api/v1/book',bookRouter);
 app.use('/api/v1/member',memberRouter);
 app.use('/api/v1/publisher',publisherRouter)
