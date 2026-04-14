@@ -8,13 +8,34 @@ import borrowRequestRouter from "./routes/borrowRequest.route.js";
 import notificationRouter from "./routes/notifications.route.js";
 import cors from "cors";
 const app = express();
-app.use(
-  cors({
-    origin: ["http://localhost:5173","https://library-hub-frontend-theta.vercel.app","https://library-hub-frontend-git-main-j-pradyumnas-projects.vercel.app","https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app"], // frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://library-hub-frontend-theta.vercel.app",
+      "https://library-hub-frontend-git-main-j-pradyumnas-projects.vercel.app",
+      "https://library-hub-frontend-884r5frqm-j-pradyumnas-projects.vercel.app",
+      // Add wildcard pattern for future Vercel previews: https://*-j-pradyumnas-projects.vercel.app
+      /^https:\/\/.*-j-pradyumnas-projects\.vercel\.app$/
+    ];
+    // Check exact match or regex
+    if (allowedOrigins.some(o => o instanceof RegExp ? o.test(origin) : o === origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200 // For legacy browsers
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));
