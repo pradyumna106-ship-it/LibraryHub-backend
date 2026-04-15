@@ -12,7 +12,8 @@ async function addBorrowRequest(req,res) {
         const { isValid, missingFields } = validateAllFields(req.body);
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
-        }
+        }   
+            await connectDB();
             const request = await BorrowRequest.create(req.body)
             res.status(201).json({
                 message:"Member Added Successfully", request
@@ -34,6 +35,7 @@ async function updateBorrowRequest(req,res) {
             if (!isValid) {
                 return res.status(400).json(missingField(missingFields));
             }
+            await connectDB();
             const request = await BorrowRequest.findByIdAndUpdate(req.params.id,req.body,{new: true})
             if (!request) return notFoundInDatabase(res, "BorrowRequest");
             res.status(200).json({
@@ -46,6 +48,7 @@ async function updateBorrowRequest(req,res) {
 
 async function getBorrowRequests(req, res) {
     try {
+            await connectDB();
             const requests = await BorrowRequest.find({});
             if (!requests) return notFoundInDatabase(res, "BorrowRequest"); 
             res.send(requests);
@@ -56,6 +59,7 @@ async function getBorrowRequests(req, res) {
 
 async function getBorrowRequestById(req,res) {
     try {
+            await connectDB();
             const request = await BorrowRequest.findById(req.params.id);
             if (!request) return notFoundInDatabase(res, "BorrowRequest");
             res.send(request);
@@ -67,6 +71,7 @@ async function getBorrowRequestById(req,res) {
 async function getBorrowRequestByMemberId(req,res) {
     try {
             const { memberId } = req.params;
+            await connectDB();
             const requests = await BorrowRequest.find({ memberId });
             if (!requests || requests.length === 0) {
                 return notFoundInDatabase(res, "BorrowRequest");
@@ -79,6 +84,7 @@ async function getBorrowRequestByMemberId(req,res) {
 
 async function deleteBorrowRequest(req,res) {
     try {
+            await connectDB();
             const request = await BorrowRequest.findByIdAndDelete(req.params.id);
             if (!request) return notFoundInDatabase(res, "BorrowRequest");
             res.status(200).json({
@@ -132,7 +138,7 @@ async function updateRequestStatus(req, res) {
         status: "Issued",
         // BorrowRequest status is tracked in BorrowRequest collection.
       });
-
+      await connectDB();
       // ✅ Update book stock
       await Book.findByIdAndUpdate(
         request.bookId,

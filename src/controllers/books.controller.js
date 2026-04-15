@@ -10,10 +10,10 @@ async function addBook(req,res) {
                 if (!isValid) {
                     return res.status(400).json(missingField(missingFields));
                 }
-
+        await connectDB();
         const book = await Book.create(req.body);
         const publisher = await Publisher.findById(book.publisherId);
-        await connectDB();
+        
         await createNotification({
             role: "Admin",
             type: "info",
@@ -85,6 +85,7 @@ async function getBookCount(req,res) {
 }
 async function getBookById(req,res) {
     try {
+        await connectDB();
         const book = await Book.findById(req.params.id).populate("publisherId");
         if (!book) return notFoundInDatabase(res, "Book");
         res.send(book);

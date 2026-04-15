@@ -114,7 +114,7 @@ async function borrowedForOneMember(req, res) {
     if (!memberId) {
       return res.status(400).json({ error: "memberId is required" });
     }
-
+    await connectDB();
     const borrowedBooks = await Transaction.aggregate([
       {
         $match: {
@@ -162,6 +162,7 @@ async function borrowedForOneMember(req, res) {
 
 async function getTransactionsWithNameTitle(req, res) {
   try {
+    await connectDB();
     const transactions = await Transaction.aggregate([
       // 🔗 Join Member
       {
@@ -217,7 +218,7 @@ async function getTransactionsWithNameTitle(req, res) {
 async function historyByMember(req, res) {
   try {
     const { memberId } = req.params;
-
+    await connectDB();
     const transactions = await Transaction.find({
       memberId,
       status: "Returned"
@@ -242,7 +243,7 @@ async function historyByMember(req, res) {
 async function borrowedBooksWithDetails(req, res) {
   try {
     const { memberId } = req.params;
-
+    await connectDB();
     const transactions = await Transaction.find({
       memberId,
       status: { $in: ["Issued", "Overdue"] }
@@ -272,7 +273,7 @@ async function getDashboardStats(req, res) {
     if (!memberId) {
       return res.status(400).json({ message: "memberId is required" });
     }
-
+    await connectDB();
     // 1️⃣ Borrowed Books Count
     const borrowed = await Transaction.countDocuments({
       memberId,
@@ -314,6 +315,7 @@ async function getDashboardStats(req, res) {
 
 async function getIssuedCount(req,res) {
     try {
+        await connectDB();
         const Issues = await Transaction.countDocuments({
           status: "Issued"
         });
@@ -329,6 +331,7 @@ async function getIssuedCount(req,res) {
 
 async function getTransactionHistory(req, res) {
   try {
+    await connectDB();
     const transactions = await Transaction.aggregate([
       {
         $match: { status: { $in: ["Returned", "OverDue"] } } // 🔥 only history
@@ -373,7 +376,7 @@ async function getTransactionHistory(req, res) {
 async function renewTransaction(req, res) {
   try {
     const { id } = req.params;
-
+    await connectDB();
     const transaction = await Transaction.findById(id);
 
     if (!transaction) {
@@ -407,7 +410,7 @@ async function renewTransaction(req, res) {
 async function returnTransaction(req, res) {
   try {
     const { id } = req.params;
-
+    await connectDB();
     const transaction = await Transaction.findById(id);
 
     if (!transaction) {
