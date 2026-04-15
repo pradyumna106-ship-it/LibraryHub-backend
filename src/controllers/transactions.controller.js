@@ -10,6 +10,7 @@ import { createNotification } from "../utils/notification.controller.js";
 async function addTransaction(req, res) {
     try {
         const { memberId, bookId } = req.body;
+        await connectDB();
         const existing = await Transaction.findOne({
             memberId,
             bookId,
@@ -59,6 +60,7 @@ async function updateTransaction(req,res) {
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
         }
+        await connectDB();
         const transaction = await Transaction.findByIdAndUpdate(req.params.id,req.body,{new:true});
         if (!transaction) return notFoundInDatabase(res, "Transaction");
         res.status(200).json({
@@ -71,6 +73,7 @@ async function updateTransaction(req,res) {
 
 async function getTransactions(req,res) {
     try {
+        await connectDB();
         const transactions = await Transaction.find({});
         if (transactions.length === 0) {
             return notFoundInDatabase(res, "Transaction");
@@ -84,6 +87,7 @@ async function getTransactions(req,res) {
 
 async function getTransactionById(req,res) {
         try {
+            await connectDB();
             const transaction = await Transaction.findById(req.params.id);
             if (!transaction) return notFoundInDatabase(res, "Transaction");
             res.send(transaction);
@@ -94,6 +98,7 @@ async function getTransactionById(req,res) {
 
 async function deleteTransaction(req,res) {
         try {
+            await connectDB();
             const transaction = await Transaction.findByIdAndDelete(req.params.id);
             if (!transaction) return notFoundInDatabase(res, "Transaction");
             res.send(transaction);

@@ -103,7 +103,7 @@ async function updateRequestStatus(req, res) {
         message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
       });
     }
-
+    await connectDB();
     // ✅ Find & update request
     const request = await BorrowRequest.findByIdAndUpdate(
       id,
@@ -120,6 +120,7 @@ async function updateRequestStatus(req, res) {
 
     // 🔥 Auto-create Transaction for Approved requests
     let transaction = null;
+    await connectDB();
     if (status === 'Approved') {
       const book = await Book.findById(request.bookId);
 

@@ -141,7 +141,7 @@ async function getMyBooks(req, res) {
     if (!id) {
       return res.status(400).json({ message: "memberId is required" });
     }
-
+    await connectDB();
     // ✅ Populate books
     const member = await Member.findById(id).populate("myBooks");
 
@@ -160,6 +160,7 @@ async function getMyBooks(req, res) {
 
 async function getMemberCount(req,res) {
     try {
+        await connectDB();
         const books = await Member.countDocuments({});
         if (!books) return notFoundInDatabase(res, "Book");
          res.send(books);
@@ -182,7 +183,7 @@ async function addMyBooks(req, res) {
     //     message: "memberId and bookIds (array) are required"
     //   });
     // }
-
+    await connectDB();
     const member = await Member.findById(id);
 
     if (!member) {
@@ -218,7 +219,7 @@ async function deleteMyBooks(req, res) {
     //     message: "memberId and bookIds (array) are required"
     //   });
     // }
-
+    await connectDB();
     const member = await Member.findById(id);
 
     if (!member) {

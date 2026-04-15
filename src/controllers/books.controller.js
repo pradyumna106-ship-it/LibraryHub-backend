@@ -13,7 +13,7 @@ async function addBook(req,res) {
 
         const book = await Book.create(req.body);
         const publisher = await Publisher.findById(book.publisherId);
-
+        await connectDB();
         await createNotification({
             role: "Admin",
             type: "info",
@@ -42,6 +42,7 @@ async function updateBook(req,res) {
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
         }
+        await connectDB();
         const book = await Book.findByIdAndUpdate(req.params.id,req.body,{new:true});
         if (!book) return notFoundInDatabase(res, "Book");
         res.status(200).json({
@@ -55,6 +56,7 @@ async function updateBook(req,res) {
 async function getBooks(req,res) {
     try {
         // Populate publisher so frontend can search by publisher name too.
+        await connectDB();
         const books = await Book.find({}).populate("publisherId");
         if (!books) return notFoundInDatabase(res, "Book");
          res.send(books);
@@ -69,6 +71,7 @@ async function getBooks(req,res) {
 
 async function getBookCount(req,res) {
     try {
+        await connectDB();
         const books = await Book.countDocuments({});
         if (!books) return notFoundInDatabase(res, "Book");
          res.send(books);

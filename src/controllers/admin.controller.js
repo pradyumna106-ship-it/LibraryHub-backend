@@ -5,6 +5,7 @@ import { validateAllFields } from "../utils/validate.js";
 
 async function addAdmin(req,res) {
     try {
+        await connectDB();
         const { isValid, missingFields } = validateAllFields(req.body);
         if (!isValid) {
                 return res.status(400).json(missingField(missingFields));
@@ -20,6 +21,7 @@ async function addAdmin(req,res) {
 
 async function updateAdmin(req,res) {
     try {
+        await connectDB();
         const { isValid, missingFields } = validateAllFields(req.body);
                 if (!isValid) {
                     return res.status(400).json(missingField(missingFields));
@@ -35,6 +37,7 @@ async function updateAdmin(req,res) {
 }
 async function getAdmins(req,res) {
     try {
+        await connectDB();
         const admins = await Admin.find({});
         if (!admins) return notFoundInDatabase(res, "Admin");
         res.send(admins);
@@ -45,6 +48,7 @@ async function getAdmins(req,res) {
 
 async function getAdminById(req,res) {
     try {
+        await connectDB();
         const admin = await Admin.findById(req.params.id);
         if (!admin) return notFoundInDatabase(res, "Admin");
         res.send(admin);
@@ -54,6 +58,7 @@ async function getAdminById(req,res) {
 }
 async function getAdminByEmail(req,res) {
     try {
+        await connectDB();
         const admin = await Admin.findOne({email:req.params.email.toLowerCase()});
         if (!admin) return notFoundInDatabase(res, "Admin");
         res.send(admin);
@@ -63,6 +68,7 @@ async function getAdminByEmail(req,res) {
 }
 async function deleteAdmin(req,res) {
     try {
+        await connectDB();
         const admin = await Admin.findByIdAndDelete(req.params.id);
         if (!admin) return notFoundInDatabase(res, "Admin");
         res.status(200).json({

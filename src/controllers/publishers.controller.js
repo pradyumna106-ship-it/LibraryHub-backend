@@ -10,6 +10,7 @@ async function addPublisher(req,res) {
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
         }
+            await connectDB();
             const publisher = await Publisher.create(req.body)
 
             await createNotification({
@@ -39,6 +40,7 @@ async function updatePublisher(req,res) {
             if (!isValid) {
                 return res.status(400).json(missingField(missingFields));
             }
+            await connectDB();
             const publisher = await Publisher.findByIdAndUpdate(req.params.id,req.body,{new: true})
             if (!publisher) return notFoundInDatabase(res, "Publisher");
             res.status(200).json({
@@ -50,7 +52,7 @@ async function updatePublisher(req,res) {
 }
 
 async function getPublishers(req, res) {
-    try {
+    try {   await connectDB();
             const publishers = await Publisher.find({});
             if (!publishers) return notFoundInDatabase(res, "Publisher"); 
             res.send(publishers);
@@ -61,6 +63,7 @@ async function getPublishers(req, res) {
 
 async function getPublisherById(req,res) {
     try {
+            await connectDB();
             const publisher = await Publisher.findById(req.params.id);
             if (!publisher) return notFoundInDatabase(res, "Publisher");
             res.send(publisher);
@@ -71,6 +74,7 @@ async function getPublisherById(req,res) {
 
 async function deletePublisher(req,res) {
     try {
+            await connectDB();
             const publisher = await Publisher.findByIdAndDelete(req.params.id);
             if (!publisher) return notFoundInDatabase(res, "Publisher");
             res.status(200).json({
