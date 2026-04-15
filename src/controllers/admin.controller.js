@@ -81,7 +81,7 @@ async function loginAdmin(req,res) {
                 message:"Email and Password required"
             });
         }
-        const user = await Admin.findOne({ email: email.toLowerCase() });
+        const user = await Admin.findOne({ email: email });
         if(!user){
             return res.status(404).json({
                 message:"User not found"

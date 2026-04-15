@@ -108,7 +108,7 @@ async function loginMember(req,res) {
                 message:"Email and Password required"
             });
         }
-        const user = await Member.findOne({ email: email.toLowerCase() });
+        const user = await Member.findOne({ email: email });
         if(!user){
             return res.status(404).json({
                 message:"User not found"
