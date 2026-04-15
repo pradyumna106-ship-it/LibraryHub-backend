@@ -81,6 +81,7 @@ async function loginAdmin(req,res) {
                 message:"Email and Password required"
             });
         }
+        await connectDB();
         const user = await Admin.findOne({ email: email });
         if(!user){
             return res.status(404).json({
