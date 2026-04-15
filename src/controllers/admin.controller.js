@@ -1,3 +1,4 @@
+import { connectDB } from "../config/database.js";
 import { Admin } from "../models/admin.model.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { validateAllFields } from "../utils/validate.js";
