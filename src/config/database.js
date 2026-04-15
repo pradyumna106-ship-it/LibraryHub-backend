@@ -1,31 +1,16 @@
 import mongoose from "mongoose";
-import { DB_NAME } from "./constant.js";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+let isConnected = false;
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is missing in environment variables");
-}
+export const connectDB = async () => {
+  if (isConnected) return;
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
-const connectDB = async () => {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: DB_NAME
-    }).then((mongoose) => {
-      return mongoose;
-    });
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    isConnected = conn.connections[0].readyState === 1;
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("DB connection failed:", error);
+    throw error;
   }
-
-  cached.conn = await cached.promise;
-  return cached.conn;
 };
-
-export default connectDB;
