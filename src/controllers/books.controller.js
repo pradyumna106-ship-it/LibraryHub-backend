@@ -4,6 +4,7 @@ import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { missingField } from "../exception/exception.js";
 import { createNotification } from "../utils/notification.controller.js";
 import { Publisher } from "../models/publishers.model.js";
+import { connectDB } from "../config/database.js";
 async function addBook(req,res) {
     try {
         const { isValid, missingFields } = validateAllFields(req.body);

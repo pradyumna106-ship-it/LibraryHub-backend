@@ -1,19 +1,25 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "./constant";
 
-let isConnected = false;
 
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 export const connectDB = async () => {
-  if (isConnected) return;
-
   try {
-    const conn = await mongoose.connect(
-      "mongodb+srv://pradyumnajekumar_db_user:OOUAMTsOKJamEdD1@cluster0.5xvzjta.mongodb.net",
-      { dbName: DB_NAME,bufferCommands: false }
-    );
+    if (cached.conn) return cached.conn;
 
-    isConnected = conn.connections[0].readyState === 1;
+    if (!cached.promise) {
+      cached.promise = mongoose.connect(
+        "mongodb+srv://pradyumnajekumar_db_user:OOUAMTsOKJamEdD1@cluster0.5xvzjta.mongodb.net",
+        { dbName: DB_NAME,bufferCommands: false }
+      );
+    }
+    cached.conn = await cached.promise;
     console.log("MongoDB connected");
+    return cached.conn;
   } catch (err) {
     console.error("DB ERROR:", err);
     throw err;

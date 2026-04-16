@@ -3,7 +3,7 @@ import { Publisher } from "../models/publishers.model.js";
 import { validateAllFields } from "../utils/validate.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { createNotification } from "../utils/notification.controller.js";
-
+import { connectDB } from "../config/database.js";
 async function addPublisher(req,res) {
     try {
         const { isValid, missingFields } = validateAllFields(req.body);

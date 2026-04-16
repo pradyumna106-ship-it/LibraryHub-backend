@@ -6,7 +6,7 @@ import { BorrowRequest } from "../models/borrowRequestSchema.js";
 import { Book } from "../models/books.model.js";
 import { Transaction } from "../models/transactions.model.js";
 import { createNotification } from "../utils/notification.controller.js";
-
+import { connectDB } from "../config/database.js";
 async function addBorrowRequest(req,res) {
     try {
         const { isValid, missingFields } = validateAllFields(req.body);
