@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "./constant.js";
-
+import {MONGODB_URI} from process.env
 
 let cached = global.mongoose;
 
@@ -13,7 +13,7 @@ export const connectDB = async () => {
 
     if (!cached.promise) {
       cached.promise = mongoose.connect(
-        "mongodb+srv://pradyumnajekumar_db_user:OOUAMTsOKJamEdD1@cluster0.5xvzjta.mongodb.net",
+        MONGODB_URI,
         { dbName: DB_NAME,bufferCommands: false }
       );
     }

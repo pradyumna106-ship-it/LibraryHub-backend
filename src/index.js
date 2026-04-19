@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import connectDB from './config/database.js';
 import app from './app.js';
+import PORT from process.env;
 dotenv.config({
     path: './.env'
 });
@@ -12,8 +13,8 @@ const startServer = async () => {
             console.error("ERROR",error)
             throw error;
         });
-        app.listen( process.env.PORT|| 5000, () => {
-            console.log(`Server is running on port ${process.env.PORT}`)
+        app.listen( PORT , () => {
+            console.log(`Server is running on port ${PORT}`)
         })
     } catch (error) {
         console.error("MongoDB Connection failed",error)
