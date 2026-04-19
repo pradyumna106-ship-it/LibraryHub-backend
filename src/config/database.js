@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "./constant.js";
-import {MONGODB_URI} from process.env
+import MONGODB_URI from meta.env
 
 let cached = global.mongoose;
 

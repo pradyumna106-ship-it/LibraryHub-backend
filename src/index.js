@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import connectDB from './config/database.js';
 import app from './app.js';
-import PORT from process.env;
+import PORT from meta.env;
 dotenv.config({
     path: './.env'
 });
