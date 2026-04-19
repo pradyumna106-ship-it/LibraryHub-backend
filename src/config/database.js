@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "./constant.js";
-
+import dotenv from 'dotenv/config';
 
 let cached = global.mongoose;
 
@@ -13,7 +13,7 @@ export const connectDB = async () => {
 
     if (!cached.promise) {
       cached.promise = mongoose.connect(
-        import.meta.env.MONGODB_URI,
+        process.env.MONGODB_URI,
         { dbName: DB_NAME,bufferCommands: false }
       );
     }
