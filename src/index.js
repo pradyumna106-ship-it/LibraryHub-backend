@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import connectDB from './config/database.js';
 import app from './app.js';
-import PORT from meta.env;
+
 dotenv.config({
     path: './.env'
 });
@@ -13,7 +13,7 @@ const startServer = async () => {
             console.error("ERROR",error)
             throw error;
         });
-        app.listen( PORT , () => {
+        app.listen( import.meta.env.PORT , () => {
             console.log(`Server is running on port ${PORT}`)
         })
     } catch (error) {
