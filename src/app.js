@@ -12,7 +12,8 @@ app.use(cors({
   origin: [
     "https://library-hub-frontend-snowy.vercel.app",
     "https://library-hub-frontend-git-main-j-pradyumnas-projects.vercel.app",
-    "https://library-hub-frontend-7339xwdn6-j-pradyumnas-projects.vercel.app"
+    "https://library-hub-frontend-7339xwdn6-j-pradyumnas-projects.vercel.app",
+    "http://localhost:5173"
   ],
   credentials: true}));
 app.use(express.json());
