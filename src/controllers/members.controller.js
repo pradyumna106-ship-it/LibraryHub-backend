@@ -36,7 +36,14 @@ async function addMember(req,res) {
             avatar = req.body.avatar;
         }
         console.log(req.body)
-        const member = await Member.create(req.body);
+        let avatar = "";
+        if (req.file) {
+            avatar = req.file.filename;
+        } else if (typeof req.body.avatar === "string") {
+            avatar = req.body.avatar;
+        }
+        await connectDB();
+        const member = await Member.create({...req.body, avatar: avatar});
         res.status(201).json({
             message:"Member Added Successfully", member
         })
@@ -85,7 +92,7 @@ async function getMemberById(req,res) {
 }
 async function getMemberByEmail(req,res) {
     try {
-        
+        await connectDB();
         const member = await Member.findOne({email:req.params.email.toLowerCase()});
         if (!member) return notFoundInDatabase(res, "Member");
         res.send(member);
@@ -95,6 +102,7 @@ async function getMemberByEmail(req,res) {
 }
 async function deleteMember(req,res) {
     try {
+        await connectDB();
         const member = await Member.findByIdAndDelete(req.params.id);
         if (!member) return notFoundInDatabase(res, "Member");
         res.status(200).json({
