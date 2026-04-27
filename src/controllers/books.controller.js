@@ -97,6 +97,7 @@ async function getBookById(req,res) {
 
 async function deleteBook(req, res) {
     try {
+        await connectDB(); 
         const book = await Book.findByIdAndDelete(req.params.id);
         if (!book) return notFoundInDatabase(res, "Book");
         res.send(book);
