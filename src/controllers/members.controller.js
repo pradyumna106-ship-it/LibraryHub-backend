@@ -158,7 +158,7 @@ async function getMemberCount(req,res) {
         await connectDB();
         const books = await Member.countDocuments({});
         if (!books) return notFoundInDatabase(res, "Book");
-         res.send(books);
+         res.status(200).json(books);
         // res.status(200).json({
         //     message: "success fully sent data",
         //     books

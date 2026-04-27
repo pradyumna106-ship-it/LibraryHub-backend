@@ -323,7 +323,7 @@ async function getIssuedCount(req,res) {
         //     message: "success fully sent data",
         //     books
         // })
-        res.send(Issues);
+        res.status(200).json(Issues);
     } catch (error) {
        return InternalServerError(error,res);
     }
