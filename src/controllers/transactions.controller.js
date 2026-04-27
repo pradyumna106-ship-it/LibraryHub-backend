@@ -34,9 +34,9 @@ async function addTransaction(req, res) {
         if (!isValid) {
             return res.status(400).json(missingField(missingFields));
         }
-
+        await connectDB();
         const transaction = await Transaction.create(transactionData);
-
+        await connectDB();
         await createNotification({
             userId: memberId,
             role: "Member",
@@ -279,13 +279,13 @@ async function getDashboardStats(req, res) {
       memberId,
       status: "Issued"
     });
-
+    await connectDB();
     // 2️⃣ Nearest Due Date (important)
     const nextDue = await Transaction.findOne({
       memberId,
       status: "Issued"
     }).sort({ dueDate: 1 }); // earliest due
-
+    await connectDB();
     // 3️⃣ Total Fine
     const fineData = await Transaction.aggregate([
       {
@@ -393,7 +393,7 @@ async function renewTransaction(req, res) {
     transaction.dueDate = new Date(
       transaction.dueDate.getTime() + 7 * 24 * 60 * 60 * 1000
     );
-
+    await connectDB();
     await transaction.save();
 
     res.status(200).json({
@@ -436,9 +436,9 @@ async function returnTransaction(req, res) {
     } else {
       transaction.fineAmount = 0;
     }
-
+    await connectDB();
     await transaction.save();
-
+    await connectDB();
     // ✅ Make the book available again after return
     await Book.findByIdAndUpdate(
       transaction.bookId,
@@ -448,6 +448,7 @@ async function returnTransaction(req, res) {
 
     // ✅ Update the corresponding borrow request for UI state.
     // If the request is still marked "Approved", mark it "Completed" on return.
+    await connectDB();
     await BorrowRequest.findOneAndUpdate(
       {
         memberId: transaction.memberId,
