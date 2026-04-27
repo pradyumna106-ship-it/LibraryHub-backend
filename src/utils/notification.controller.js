@@ -1,8 +1,9 @@
 import { Notification } from "../models/notification.model.js";
 import { InternalServerError } from "./response.js";
-
+import { connectDB } from "../config/database.js";
 export const createNotification = async (data) => {
     try {
+        await connectDB();
         return await Notification.create(data);
     } catch (error) {
         // Notification failures should not block core flows.
@@ -41,7 +42,7 @@ export const getNotifications = async (req, res) => {
             }
             query.$or = [{ userId: null }, { userId }];
         }
-
+        await connectDB();
         const notifications = await Notification.find(query).sort({ createdAt: -1 });
         return res.status(200).json(notifications);
     } catch (error) {
@@ -52,6 +53,7 @@ export const getNotifications = async (req, res) => {
 export const markNotificationAsRead = async (req, res) => {
     try {
         const { id } = req.params;
+        await connectDB();
         const notification = await Notification.findByIdAndUpdate(
             id,
             { $set: { read: true } },
@@ -84,7 +86,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
             }
             query.$or = [{ userId: null }, { userId }];
         }
-
+        await connectDB();
         await Notification.updateMany(query, { $set: { read: true } });
         return res.status(200).json({ message: "All notifications marked as read" });
     } catch (error) {
