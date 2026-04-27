@@ -12,7 +12,7 @@ export const connectDB = async () => {
     if (cached.conn) return cached.conn;
 
     if (!cached.promise) {
-      cached.promise = mongoose.connect(
+      cached.promise = await mongoose.connect(
         process.env.MONGODB_URI,
         { dbName: DB_NAME,bufferCommands: false }
       );
