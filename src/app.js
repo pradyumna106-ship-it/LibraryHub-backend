@@ -18,9 +18,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
   credentials: true}));
-app.options('/{*path}', cors());
-app.use('/{*path}', handler);
-app.get('/{*path}', handler);
+app.options('/api', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));
