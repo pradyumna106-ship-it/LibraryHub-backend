@@ -68,18 +68,19 @@ async function getBorrowRequestById(req,res) {
     }
 }
 
-async function getBorrowRequestByMemberId(req,res) {
-    try {
-            const { memberId } = req.params;
-            await connectDB();
-            const requests = await BorrowRequest.find({ memberId });
-            if (!requests || requests.length === 0) {
-                return notFoundInDatabase(res, "BorrowRequest");
-            }
-            res.send(requests);
-        } catch (error) {
-            return InternalServerError(error,res)
-    }
+// borrowRequest.controller.js
+async function getBorrowRequestByMemberId(req, res) {
+  try {
+    const { memberId } = req.params;
+    await connectDB();
+    const requests = await BorrowRequest.find({ memberId });
+    
+    // ✅ Return empty array instead of 404 — empty results are valid
+    res.status(200).json(requests); // [] is fine, not an error
+    
+  } catch (error) {
+    return InternalServerError(error, res);
+  }
 }
 
 async function deleteBorrowRequest(req,res) {
