@@ -15,7 +15,10 @@ app.use(cors({
     "https://library-hub-frontend-7339xwdn6-j-pradyumnas-projects.vercel.app",
     "http://localhost:5173"
   ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
   credentials: true}));
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for form
 app.use("/uploads", express.static("uploads"));

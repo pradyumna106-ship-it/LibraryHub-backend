@@ -19,11 +19,6 @@ const startServer = async () => {
     } catch (error) {
         console.error("MongoDB Connection failed",error)
     }
-}
-app.get("/",(req,res) => {
-    res.json({
-         message: "Hello from server",
-    });
-});
+};
 
 startServer();
