@@ -3,53 +3,35 @@ import { Member } from "../models/members.model.js";
 import { InternalServerError, notFoundInDatabase } from "../utils/response.js";
 import { validateAllFields } from "../utils/validate.js";
 
-async function addMember(req,res) {
+async function addMember(req, res) {
     try {
-        const { isValid, missingFields } = validateAllFields(req.body);
-        if (!isValid) {
-                return res.status(400).json(missingField(missingFields));
-        }
-        const { name, email, password } = req.body;
-        console.log(name,email,password)
-        // ✅ declare first
-        const missingField = !name || !email || !password;
+        const { name, email, password } = req.body; // ✅ no avatar here
 
-        // ✅ then use
-        if (missingField) {
-        return res.status(400).json({
-            message: "Required fields are missing"
-        });
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "Required fields are missing" });
         }
+
         await connectDB();
-        // ✅ CHECK FIRST
+
         const existingUser = await Member.findOne({ email });
-
         if (existingUser) {
-        return res.status(400).json({
-            message: "Email already exists"
-        });
+            return res.status(400).json({ message: "Email already exists" });
         }
+
+        // ✅ Single declaration of avatar
         let avatar = "";
         if (req.file) {
             avatar = req.file.filename;
         } else if (typeof req.body.avatar === "string") {
             avatar = req.body.avatar;
         }
-        console.log(req.body)
-        let avatar = "";
-        if (req.file) {
-            avatar = req.file.filename;
-        } else if (typeof req.body.avatar === "string") {
-            avatar = req.body.avatar;
-        }
-        await connectDB();
-        const member = await Member.create({...req.body, avatar: avatar});
-        res.status(201).json({
-            message:"Member Added Successfully", member
-        })
+
+        const member = await Member.create({ ...req.body, avatar });
+        res.status(201).json({ message: "Member Added Successfully", member });
+
     } catch (error) {
-        console.error(error)
-        InternalServerError(error,res);
+        console.error(error);
+        InternalServerError(error, res);
     }
 }
 
