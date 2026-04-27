@@ -20,6 +20,7 @@ async function addMember(req,res) {
             message: "Required fields are missing"
         });
         }
+        await connectDB();
         // ✅ CHECK FIRST
         const existingUser = await Member.findOne({ email });
 
@@ -51,6 +52,7 @@ async function updateMember(req,res) {
                 if (!isValid) {
                     return res.status(400).json(missingField(missingFields));
                 }
+        await connectDB();
         const member = await Member.findByIdAndUpdate(req.params.id,req.body,{new: true})
         if (!member) return notFoundInDatabase(res, "Member");
         res.status(200).json({
@@ -62,6 +64,7 @@ async function updateMember(req,res) {
 }
 async function getMembers(req,res) {
     try {
+        await connectDB();
         const members = await Member.find({});
         if (!members) return notFoundInDatabase(res, "Member");
         res.send(members);
@@ -72,6 +75,7 @@ async function getMembers(req,res) {
 
 async function getMemberById(req,res) {
     try {
+        await connectDB();
         const member = await Member.findById(req.params.id);
         if (!member) return notFoundInDatabase(res, "Member");
         res.send(member);
@@ -81,6 +85,7 @@ async function getMemberById(req,res) {
 }
 async function getMemberByEmail(req,res) {
     try {
+        
         const member = await Member.findOne({email:req.params.email.toLowerCase()});
         if (!member) return notFoundInDatabase(res, "Member");
         res.send(member);
