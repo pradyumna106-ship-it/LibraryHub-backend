@@ -124,14 +124,20 @@ async function borrowedForOneMember(req, res) {
       },
       {
         $lookup: {
-          from: "books",            // ⚠️ collection name (lowercase plural)
+          from: "books",
           localField: "bookId",
           foreignField: "_id",
           as: "bookDetails"
         }
       },
       {
-        $unwind: "$bookDetails"    // convert array → object
+        $unwind: {
+          path: "$bookDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $sort: { issueDate: -1 }
       },
       {
         $project: {
@@ -142,8 +148,6 @@ async function borrowedForOneMember(req, res) {
           dueDate: 1,
           returnDate: 1,
           status: 1,
-
-          // ✅ Book fields
           title: "$bookDetails.title",
           author: "$bookDetails.author",
           category: "$bookDetails.category",
@@ -153,7 +157,7 @@ async function borrowedForOneMember(req, res) {
       }
     ]);
 
-    res.send(borrowedBooks);
+    res.status(200).json(borrowedBooks);
 
   } catch (error) {
     return InternalServerError(error, res);
